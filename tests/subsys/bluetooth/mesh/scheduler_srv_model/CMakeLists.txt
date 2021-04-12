@@ -16,3 +16,8 @@ target_include_directories(app
   .
   ${ZEPHYR_BASE}/../nrf/subsys/bluetooth/mesh/
   )
+
+zephyr_ld_options(
+    ${LINKERFLAGPREFIX},--allow-multiple-definition
+  )
+  

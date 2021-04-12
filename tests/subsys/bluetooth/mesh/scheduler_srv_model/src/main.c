@@ -35,6 +35,13 @@ static const struct bt_mesh_comp comp = {
 //static void test_teardown(void)
 //{
 //}
+#include "common/log.h"
+int bt_mesh_init(const struct bt_mesh_prov *prov,
+		 const struct bt_mesh_comp *comp)
+{
+	BT_ERR("This is mock from test");
+	return 0;
+}
 
 static void test_scheduler_init(void)
 {
