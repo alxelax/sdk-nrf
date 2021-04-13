@@ -29,6 +29,7 @@ static const struct bt_mesh_comp comp = {
 	.elem_count = ARRAY_SIZE(elems),
 };
 
+/****************** mock section **********************************/
 int bt_mesh_prov_init(const struct bt_mesh_prov *prov_info)
 {
 	return 0;
@@ -50,13 +51,16 @@ int bt_mesh_model_extend(struct bt_mesh_model *mod,
 
 	return 0;
 }
+/****************** mock section **********************************/
 
+/****************** callback section ******************************/
 static void scheduler_action_set_cb(struct bt_mesh_scheduler_srv *srv,
 				    struct bt_mesh_msg_ctx *ctx,
 				    uint8_t idx,
 				    struct bt_mesh_schedule_entry *entry)
 {
 }
+/****************** callback section ******************************/
 
 static void test_scheduler_init(void)
 {
