@@ -14,13 +14,11 @@ static void scheduler_action_set_cb(struct bt_mesh_scheduler_srv *srv,
 				    struct bt_mesh_schedule_entry *entry);
 
 static struct bt_mesh_time_srv time_srv = BT_MESH_TIME_SRV_INIT(NULL);
-static struct bt_mesh_scene_srv scene_srv;
 static struct bt_mesh_scheduler_srv scheduler_srv =
 	BT_MESH_SCHEDULER_SRV_INIT(scheduler_action_set_cb, &time_srv);
 
 static struct bt_mesh_elem elems[] = {
 	BT_MESH_ELEM(0, BT_MESH_MODEL_LIST(
-		BT_MESH_MODEL_SCENE_SRV(&scene_srv),
 		BT_MESH_MODEL_SCHEDULER_SRV(&scheduler_srv),
 		BT_MESH_MODEL_TIME_SRV(&time_srv),
 	), BT_MESH_MODEL_NONE),
@@ -64,7 +62,7 @@ static void test_scheduler_init(void)
 {
 	zassert_true(0 == bt_mesh_init(NULL, &comp), "bt mesh initialization failed.");
 
-	zassert_equal_ptr(scheduler_srv.model, &elems[0].models[1],
+	zassert_equal_ptr(scheduler_srv.model, &elems[0].models[0],
 			"wrong initialization of the model pointer.");
 	zassert_equal_ptr(scheduler_srv.pub.msg, &scheduler_srv.pub_buf,
 			"wrong initialization of the publication message pointer.");
