@@ -62,7 +62,13 @@ static void test_scheduler_init(void)
 {
 	zassert_true(0 == bt_mesh_init(NULL, &comp), "bt mesh initialization failed.");
 
-	zassert_equal_ptr(scheduler_srv.model, &elems[0].models[0],
+	zassert_equal_ptr(scheduler_srv.action_set_cb, scheduler_action_set_cb,
+			"wrong initialization of the action set callback.");
+	zassert_equal_ptr(scheduler_srv.time_srv, &time_srv,
+			"wrong initialization of the time server pointer.");
+
+	/* The first the scene\scene setup servers go. */
+	zassert_equal_ptr(scheduler_srv.model, &elems[0].models[2],
 			"wrong initialization of the model pointer.");
 	zassert_equal_ptr(scheduler_srv.pub.msg, &scheduler_srv.pub_buf,
 			"wrong initialization of the publication message pointer.");
@@ -79,8 +85,28 @@ static void test_scheduler_init(void)
 	zassert_equal(scheduler_srv.idx, BT_MESH_SCHEDULER_ACTION_ENTRY_COUNT,
 				"scheduler register index has not been initialized.");
 
-	// todo scheduler register checking
-	// todo delayable work initialization checking
+	for (int i = 0; i < BT_MESH_SCHEDULER_ACTION_ENTRY_COUNT; i++) {
+		zassert_equal(scheduler_srv.sch_reg[i].year, 0,
+			"scheduler register year not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].month, 0,
+			"scheduler register month not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].day, 0,
+			"scheduler register day not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].hour, 0,
+			"scheduler register hour not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].minute, 0,
+			"scheduler register minute not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].second, 0,
+			"scheduler register second not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].day_of_week, 0,
+			"scheduler register day_of_week not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].action, 0,
+			"scheduler register action not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].transition_time, 0,
+			"scheduler register transition_time not initialized instance: %i.", i);
+		zassert_equal(scheduler_srv.sch_reg[i].scene_number, 0,
+			"scheduler register scene_number not initialized instance: %i.", i);
+	}
 
 	for (int i = 0; i < BT_MESH_SCHEDULER_ACTION_ENTRY_COUNT; i++) {
 		zassert_equal(scheduler_srv.sched_tai[i].sec, 0,
