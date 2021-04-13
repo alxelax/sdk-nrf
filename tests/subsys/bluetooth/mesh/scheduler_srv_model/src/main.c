@@ -31,6 +31,11 @@ static const struct bt_mesh_comp comp = {
 	.elem_count = ARRAY_SIZE(elems),
 };
 
+int bt_mesh_prov_init(const struct bt_mesh_prov *prov_info)
+{
+	return 0;
+}
+
 int bt_mesh_model_extend(struct bt_mesh_model *mod,
 			 struct bt_mesh_model *base_mod)
 {
