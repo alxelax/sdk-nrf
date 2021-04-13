@@ -11,12 +11,6 @@ project(bt_mesh_scheduler_srv_test)
 FILE(GLOB app_sources src/*.c)
 target_sources(app PRIVATE ${app_sources})
 
-target_include_directories(app
-  PRIVATE
-  .
-  ${ZEPHYR_BASE}/../nrf/subsys/bluetooth/mesh/
-  )
-
 zephyr_ld_options(
     ${LINKERFLAGPREFIX},--allow-multiple-definition
   )

@@ -87,7 +87,7 @@ static void test_scheduler_init(void)
 	zassert_equal(scheduler_srv.status_bitmap, 0,
 			"scheduler status bitmap state has not been initialized.");
 	zassert_equal(scheduler_srv.idx, BT_MESH_SCHEDULER_ACTION_ENTRY_COUNT,
-				"scheduler register index has not been initialized.");
+			"scheduler register index has not been initialized.");
 
 	for (int i = 0; i < BT_MESH_SCHEDULER_ACTION_ENTRY_COUNT; i++) {
 		zassert_equal(scheduler_srv.sch_reg[i].year, 0,
