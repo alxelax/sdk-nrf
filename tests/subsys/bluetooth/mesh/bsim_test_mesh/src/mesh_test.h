@@ -24,6 +24,7 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/mesh.h>
+#include <bluetooth/mesh/models.h>
 
 #define TEST_MOD_ID 0x8888
 #define TEST_MSG_OP BT_MESH_MODEL_OP_1(0x0f)
@@ -96,4 +97,9 @@ int bt_mesh_test_send_async(uint16_t addr, size_t len,
 			    enum bt_mesh_test_send_flags flags,
 			    const struct bt_mesh_send_cb *send_cb,
 			    void *cb_data);
+
+void scheduler_action_set_cb(struct bt_mesh_scheduler_srv *srv,
+			     struct bt_mesh_msg_ctx *ctx,
+			     uint8_t idx,
+			     struct bt_mesh_schedule_entry *entry);
 #endif /* ZEPHYR_TESTS_BLUETOOTH_BSIM_BT_BSIM_TEST_MESH_MESH_TEST_H_ */

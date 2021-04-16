@@ -77,10 +77,18 @@ static struct bt_mesh_model_pub pub = {
 
 static struct bt_mesh_cfg_cli cfg_cli;
 
+static struct bt_mesh_time_srv time_srv = BT_MESH_TIME_SRV_INIT(NULL);
+static struct bt_mesh_scheduler_srv scheduler_srv =
+	BT_MESH_SCHEDULER_SRV_INIT(scheduler_action_set_cb, &time_srv);
+static struct bt_mesh_scheduler_cli scheduler_cli;
+
 static struct bt_mesh_model models[] = {
 	BT_MESH_MODEL_CFG_SRV,
 	BT_MESH_MODEL_CFG_CLI(&cfg_cli),
 	BT_MESH_MODEL(TEST_MOD_ID, model_op, &pub, NULL),
+	BT_MESH_MODEL_SCHEDULER_SRV(&scheduler_srv),
+	BT_MESH_MODEL_TIME_SRV(&time_srv),
+	BT_MESH_MODEL_SCHEDULER_CLI(&scheduler_cli)
 };
 
 static struct bt_mesh_elem elems[] = {
@@ -139,6 +147,28 @@ static void bt_enabled(void)
 	if (err || status != BT_MESH_TRANSMIT(2, 20)) {
 		FAIL("Net transmit set failed (err %d, status %u)", err,
 		     status);
+		return;
+	}
+
+	/* Scheduler model configuration */
+	err = bt_mesh_cfg_mod_app_bind(0, cfg->addr, cfg->addr, 0, BT_MESH_MODEL_ID_SCHEDULER_SRV,
+				       &status);
+	if (err || status) {
+		FAIL("Mod app bind failed (err %d, status %u)", err, status);
+		return;
+	}
+
+	err = bt_mesh_cfg_mod_app_bind(0, cfg->addr, cfg->addr, 0, BT_MESH_MODEL_ID_SCHEDULER_SETUP_SRV,
+				       &status);
+	if (err || status) {
+		FAIL("Mod app bind failed (err %d, status %u)", err, status);
+		return;
+	}
+
+	err = bt_mesh_cfg_mod_app_bind(0, cfg->addr, cfg->addr, 0, BT_MESH_MODEL_ID_SCHEDULER_CLI,
+				       &status);
+	if (err || status) {
+		FAIL("Mod app bind failed (err %d, status %u)", err, status);
 		return;
 	}
 }
