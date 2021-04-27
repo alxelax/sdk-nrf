@@ -4,4 +4,4 @@
 
 source $(dirname "${BASH_SOURCE[0]}")/../../_mesh_test.sh
 
-RunTest mesh_scheduler_model_initialization scheduler_model_server_init
+RunTest mesh_scheduler_model_initialization scheduler_model_server_check_init scheduler_model_client_check_init

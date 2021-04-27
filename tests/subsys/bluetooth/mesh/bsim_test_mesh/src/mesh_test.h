@@ -26,9 +26,6 @@
 #include <bluetooth/mesh.h>
 #include <bluetooth/mesh/models.h>
 
-#define TEST_MOD_ID 0x8888
-#define TEST_MSG_OP BT_MESH_MODEL_OP_1(0x0f)
-
 #define FAIL(msg, ...)                                                         \
 	do {                                                                   \
 		bst_result = Failed;                                           \
@@ -56,47 +53,14 @@ struct bt_mesh_test_cfg {
 	uint8_t dev_key[16];
 };
 
-enum bt_mesh_test_send_flags {
-	FORCE_SEGMENTATION = BIT(0),
-	LONG_MIC = BIT(1),
-};
-
-struct bt_mesh_test_stats {
-	uint32_t received;
-	uint32_t sent;
-	uint32_t recv_overflow;
-};
-
-struct bt_mesh_test_msg {
-	sys_snode_t _node;
-	size_t len;
-	uint8_t seq;
-	struct bt_mesh_msg_ctx ctx;
-};
-
 extern enum bst_result_t bst_result;
-extern const struct bt_mesh_test_cfg *cfg;
-extern struct bt_mesh_model *test_model;
 extern const uint8_t test_net_key[16];
 extern const uint8_t test_app_key[16];
 extern const uint8_t test_va_uuid[16];
-extern struct bt_mesh_test_stats test_stats;
-extern struct bt_mesh_msg_ctx test_send_ctx;
 
 void bt_mesh_test_cfg_set(const struct bt_mesh_test_cfg *cfg, int wait_time);
 void bt_mesh_test_setup(void);
 void bt_mesh_test_timeout(bs_time_t HW_device_time);
-
-int bt_mesh_test_recv(uint16_t len, uint16_t dst, k_timeout_t timeout);
-int bt_mesh_test_recv_msg(struct bt_mesh_test_msg *msg, k_timeout_t timeout);
-int bt_mesh_test_recv_clear(void);
-
-int bt_mesh_test_send(uint16_t addr, size_t len,
-		      enum bt_mesh_test_send_flags flags, k_timeout_t timeout);
-int bt_mesh_test_send_async(uint16_t addr, size_t len,
-			    enum bt_mesh_test_send_flags flags,
-			    const struct bt_mesh_send_cb *send_cb,
-			    void *cb_data);
 
 void scheduler_action_set_cb(struct bt_mesh_scheduler_srv *srv,
 			     struct bt_mesh_msg_ctx *ctx,

@@ -15,8 +15,7 @@ project(bsim_test_mesh)
 target_sources(app PRIVATE
 	src/main.c
 	src/mesh_test.c
-	src/test_transport.c
-	src/test_friendship.c
+	src/test_scheduler_model.c
 )
 
 zephyr_include_directories(
