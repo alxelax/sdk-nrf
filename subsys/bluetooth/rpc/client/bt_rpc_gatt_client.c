@@ -1518,6 +1518,20 @@ int bt_gatt_unsubscribe(struct bt_conn *conn,
 	return result;
 }
 
+void bt_gatt_cancel(struct bt_conn *conn, void *params)
+{
+	struct nrf_rpc_cbor_ctx ctx;
+	size_t buffer_size_max = 8;
+
+	NRF_RPC_CBOR_ALLOC(&bt_rpc_grp, ctx, buffer_size_max);
+
+	bt_rpc_encode_bt_conn(&ctx, conn);
+	ser_encode_uint(&ctx, (uintptr_t)params);
+
+	nrf_rpc_cbor_cmd_rsp_no_err(&bt_rpc_grp, BT_GATT_CANCEL_RPC_CMD, &ctx);
+	nrf_rpc_cbor_decoding_done(&bt_rpc_grp, &ctx);
+}
+
 static int bt_rpc_gatt_subscribe_flag_update(struct bt_gatt_subscribe_params *params,
 					     uint32_t flags_bit, int val)
 {

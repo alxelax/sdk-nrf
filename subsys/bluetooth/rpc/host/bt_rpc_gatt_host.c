@@ -1678,6 +1678,29 @@ decoding_error:
 NRF_RPC_CBOR_CMD_DECODER(bt_rpc_grp, bt_gatt_unsubscribe, BT_GATT_UNSUBSCRIBE_RPC_CMD,
 	bt_gatt_unsubscribe_rpc_handler, NULL);
 
+static void bt_gatt_cancel_rpc_handler(const struct nrf_rpc_group *group,
+					    struct nrf_rpc_cbor_ctx *ctx, void *handler_data)
+{
+	struct bt_conn *conn;
+	uintptr_t remote_pointer;
+
+	conn = bt_rpc_decode_bt_conn(ctx);
+	remote_pointer = ser_decode_uint(ctx);
+
+	if (!ser_decoding_done_and_check(group, ctx)) {
+		goto decoding_error;
+	}
+
+	bt_gatt_cancel(conn, remote_pointer);
+
+	return;
+decoding_error:
+	report_decoding_error(BT_GATT_CANCEL_RPC_CMD, handler_data);
+}
+
+NRF_RPC_CBOR_CMD_DECODER(bt_rpc_grp, bt_gatt_cancel, BT_GATT_CANCEL_RPC_CMD,
+	bt_gatt_cancel_rpc_handler, NULL);
+
 static void bt_rpc_gatt_subscribe_flag_update_rpc_handler(const struct nrf_rpc_group *group,
 							  struct nrf_rpc_cbor_ctx *ctx,
 							  void *handler_data)
