@@ -10,6 +10,8 @@ enum ot_rpc_cmd_client {
 	OT_RPC_CMD_CLI_OUTPUT = 0,
 	OT_RPC_CMD_STATE_CHANGED,
 	OT_RPC_CMD_IF_RECEIVE,
+	/* joiner.h API */
+	/* commissioner.h API */
 };
 
 /** @brief Command IDs accepted by the OpenThread over RPC server.
@@ -22,4 +24,12 @@ enum ot_rpc_cmd_server {
 	OT_RPC_CMD_REMOVE_STATE_CHANGED_CALLBACK,
 	OT_RPC_CMD_IF_ENABLE,
 	OT_RPC_CMD_IF_SEND,
+	/* joiner.h API */
+	OT_RPC_CMD_JOINER_START,
+	OT_RPC_CMD_JOINER_STOP,
+	OT_RPC_CMD_JOINER_GET_STATE,
+	OT_RPC_CMD_JOINER_GET_ID,
+	OT_RPC_CMD_JOINER_SET_DISCERNER,
+	OT_RPC_CMD_JOINER_GET_DISCERNER,
+	/* commissioner.h API */
 };

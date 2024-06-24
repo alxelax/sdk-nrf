@@ -6,6 +6,7 @@
 
 #include <ot_rpc_ids.h>
 #include <ot_rpc_types.h>
+#include <ot_rpc_common.h>
 
 #include <nrf_rpc_cbor.h>
 
@@ -15,22 +16,12 @@
 
 #include <string.h>
 
-NRF_RPC_GROUP_DECLARE(ot_group);
-
 #define OT_RPC_MAX_NUM_UNICAST_ADDRESSES 8
 
 static struct ot_unicast_addresses {
 	otNetifAddress *head;
 	otNetifAddress buffer[OT_RPC_MAX_NUM_UNICAST_ADDRESSES];
 } ot_unicast_addresses;
-
-static void decode_void(const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
-			void *handler_data)
-{
-	ARG_UNUSED(group);
-	ARG_UNUSED(ctx);
-	ARG_UNUSED(handler_data);
-}
 
 static void decode_unicast_addresses(const struct nrf_rpc_group *group,
 				     struct nrf_rpc_cbor_ctx *ctx, void *handler_data)
@@ -87,15 +78,6 @@ const otNetifAddress *otIp6GetUnicastAddresses(otInstance *aInstance)
 	return ot_unicast_addresses.head;
 }
 
-static void decode_error(const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
-			 void *handler_data)
-{
-	otError *error = handler_data;
-	int32_t errorCode;
-
-	*error = zcbor_int32_decode(ctx->zs, &errorCode) ? (otError)errorCode : -EINVAL;
-}
-
 otError otSetStateChangedCallback(otInstance *aInstance, otStateChangedCallback aCallback,
 				  void *aContext)
 {
@@ -111,7 +93,7 @@ otError otSetStateChangedCallback(otInstance *aInstance, otStateChangedCallback 
 	zcbor_uint32_put(ctx.zs, (uint32_t)aContext);
 
 	nrf_rpc_cbor_cmd_no_err(&ot_group, OT_RPC_CMD_SET_STATE_CHANGED_CALLBACK, &ctx,
-				decode_error, &error);
+				ot_rpc_decode_error, &error);
 
 	return error;
 }
@@ -130,7 +112,7 @@ void otRemoveStateChangeCallback(otInstance *aInstance, otStateChangedCallback a
 	zcbor_uint32_put(ctx.zs, (uint32_t)aContext);
 
 	nrf_rpc_cbor_cmd_no_err(&ot_group, OT_RPC_CMD_REMOVE_STATE_CHANGED_CALLBACK, &ctx,
-				decode_void, NULL);
+				ot_rpc_decode_void, NULL);
 }
 
 static void ot_rpc_cmd_state_changed(const struct nrf_rpc_group *group,
