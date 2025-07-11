@@ -223,7 +223,7 @@ bool emds_is_ready(void)
 
 uint32_t emds_store_time_get(void)
 {
-	return 0;
+	return UINT32_MAX;
 }
 
 static uint8_t *emds_entry_memory_get(struct emds_data_entry *entry)
@@ -287,11 +287,10 @@ int emds_load(void)
 {
 	struct emds_snapshot_candidate candidate = {0};
 
-	if (emds_state != EMDS_STATE_INITIALIZED) {
+	if (emds_state == EMDS_STATE_NOT_INITIALIZED) {
 		return -ECANCELED;
 	}
 
-	freshest_snapshot.index = -1;
 	for (int i = 0; i < PARTITIONS_NUM_MAX; i++) {
 		if (emds_flash_scan_partition(&partition[i], &candidate)) {
 			LOG_ERR("Failed to scan partition: %d", i);
@@ -306,7 +305,7 @@ int emds_load(void)
 
 	emds_state = EMDS_STATE_SYNCHRONIZED;
 
-	if (freshest_snapshot.index < 0) {
+	if (freshest_snapshot.metadata.fresh_cnt == 0) {
 		LOG_WRN("No valid snapshot found in any partition");
 		return -ENOENT;
 	}
@@ -492,6 +491,7 @@ int emds_store(void)
 	}
 
 unlock_and_exit:
+	emds_state = EMDS_STATE_INITIALIZED;
 	RESUME_POFWARN();
 	/* Unlock all interrupts */
 	irq_unlock(store_key);
@@ -512,6 +512,8 @@ int emds_clear(void)
 		return -ECANCELED;
 	}
 
+	memset(&freshest_snapshot, 0, sizeof(freshest_snapshot));
+	memset(&allocated_snapshot, 0, sizeof(allocated_snapshot));
 	for (int i = 0; i < PARTITIONS_NUM_MAX; i++) {
 		rc = emds_flash_erase_partition(&partition[i]);
 		if (rc) {

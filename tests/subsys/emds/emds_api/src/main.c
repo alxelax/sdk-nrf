@@ -26,15 +26,6 @@
 #define EMDS_FLASH_BLOCK_SIZE DT_PROP(FLASH, write_block_size)
 #endif
 
-/* Allocation Table Entry */
-struct test_ate {
-	uint16_t id;       /* data id */
-	uint16_t offset;   /* data offset within sector */
-	uint16_t len;      /* data len within sector */
-	uint8_t crc8_data; /* crc8 check of the entry */
-	uint8_t crc8;      /* crc8 check of the entry */
-} __packed;
-
 enum test_states {
 	EMDS_TS_EMPTY_FLASH,
 	EMDS_TS_STORE_DATA,
@@ -129,23 +120,20 @@ static void init(void)
 static void add_d_entries(void)
 {
 	int err;
-	int ate_size = align_size(sizeof(struct test_ate));
-	uint32_t store_expected =
-		DIV_ROUND_UP(sizeof(s_data), EMDS_FLASH_BLOCK_SIZE) * EMDS_FLASH_BLOCK_SIZE +
-		ate_size;
+	uint32_t store_expected = sizeof(s_data) + sizeof(struct emds_data_entry);
+	uint32_t store_used;
 
 	for (int i = 0; i < ARRAY_SIZE(d_entries); i++) {
 		err = emds_entry_add(&d_entries[i]);
-		store_expected += DIV_ROUND_UP(d_entries[i].entry.len, EMDS_FLASH_BLOCK_SIZE) *
-				  EMDS_FLASH_BLOCK_SIZE;
-		store_expected += ate_size;
+		store_expected += d_entries[i].entry.len + sizeof(struct emds_data_entry);
 		zassert_equal(err, 0, "Add entry failed");
 
 		err = emds_entry_add(&d_entries[i]);
 		zassert_equal(err, -EINVAL, "Entry duplicated");
 	}
 
-	uint32_t store_used = emds_store_size_get();
+	err = emds_store_size_get(&store_used);
+	zassert_equal(err, 0, "Getting store size failed");
 
 	zassert_equal(store_used, store_expected, "Wrong storage size: expected: %i, got: %i",
 		      store_expected, store_used);
@@ -159,7 +147,7 @@ static void load_empty_flash(void)
 	memcpy(d_data, test_d_data, sizeof(d_data));
 	memcpy(s_data, test_s_data, sizeof(s_data));
 
-	zassert_equal(emds_load(), 0, "Load failed");
+	zassert_equal(emds_load(), -ENOENT, "Load failed");
 
 	zassert_mem_equal(d_data, test_d_data, sizeof(d_data),
 			  "Data has changed");
@@ -330,7 +318,8 @@ ZTEST(clear_flash, test_clear_flash)
 
 ZTEST(no_store, test_no_store)
 {
-	load_flash();
+	clear();
+	load_empty_flash();
 	prepare();
 	load_empty_flash();
 }
@@ -339,11 +328,9 @@ ZTEST(several_store, test_several_store)
 {
 	load_flash();
 	prepare();
-	load_empty_flash();
 	store();
 	load_flash();
 	prepare();
-	load_empty_flash();
 	store();
 	load_flash();
 }
