@@ -14,5 +14,8 @@ target_sources(app PRIVATE
   src/model_handler.c
   src/lc_pwm_led.c
 )
-target_include_directories(app PRIVATE include)
+target_include_directories(app PRIVATE
+  include
+  ${ZEPHYR_BASE}/subsys/bluetooth/mesh
+)
 # NORDIC SDK APP END

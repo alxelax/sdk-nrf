@@ -9,11 +9,18 @@
  */
 #include <zephyr/logging/log_ctrl.h>
 #include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/mesh/cfg.h>
 #include <bluetooth/mesh/models.h>
 #include <bluetooth/mesh/dk_prov.h>
 #include <dk_buttons_and_leds.h>
 #include "model_handler.h"
 #include "lc_pwm_led.h"
+
+/* Mesh-internal headers for bt_mesh_trans_send / bt_mesh_primary_addr */
+#include "net.h"
+#include "transport.h"
+#include "access.h"
+#include "rpl.h"
 
 #ifdef CONFIG_EMDS
 #include <emds/emds.h>
@@ -75,6 +82,68 @@ static void isr_emds_cb(void *arg)
 }
 #endif
 
+static void pts_button_cb(uint32_t button_state, uint32_t has_changed)
+{
+	if (!(has_changed & button_state)) {
+		return;
+	}
+
+	if (!bt_mesh_is_provisioned()) {
+		printk("Not provisioned\n");
+		return;
+	}
+
+	if (has_changed & button_state & BIT(2)) {
+		bt_mesh_rpl_clear();
+		printk("RPL cleared\n");
+		return;
+	}
+
+	if (!(has_changed & button_state & BIT(3))) {
+		return;
+	}
+
+	/* Find any app key on the node, or create one */
+	uint16_t app_idx;
+	ssize_t count = bt_mesh_app_keys_get(BT_MESH_KEY_ANY, &app_idx, 1, 0);
+
+	if (count <= 0) {
+		static const uint8_t key[16] = { [0 ... 15] = 0xAB };
+
+		app_idx = 0x000;
+		uint8_t status = bt_mesh_app_key_add(app_idx, 0x0000, key);
+
+		if (status) {
+			printk("App key add failed (status 0x%02x)\n", status);
+			return;
+		}
+		printk("Added app key 0x%03x\n", app_idx);
+	}
+
+	struct bt_mesh_msg_ctx ctx = {
+		.app_idx = app_idx,
+		.addr = 0xFFFF,
+		.send_ttl = BT_MESH_TTL_DEFAULT,
+	};
+
+	/*
+	 * 11-byte access payload → 16-byte unsegmented TransportPDU
+	 * (1 hdr + 11 encrypted + 4 TransMIC)
+	 */
+	NET_BUF_SIMPLE_DEFINE(buf, 11 + BT_MESH_MIC_SHORT);
+	net_buf_simple_add_mem(&buf,
+		(uint8_t[]){0x82, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 11);
+
+	struct bt_mesh_net_tx tx = {
+		.ctx = &ctx,
+		.src = bt_mesh_primary_addr(),
+	};
+
+	int err = bt_mesh_trans_send(&tx, &buf, NULL, NULL);
+
+	printk("Max TransportPDU send: %d (app_idx 0x%03x)\n", err, app_idx);
+}
+
 static void bt_ready(int err)
 {
 	if (err) {
@@ -95,6 +164,12 @@ static void bt_ready(int err)
 		printk("Initializing buttons failed (err %d)\n", err);
 		return;
 	}
+
+	static struct button_handler pts_button_handler = {
+		.cb = pts_button_cb,
+	};
+
+	dk_button_handler_add(&pts_button_handler);
 
 #ifdef CONFIG_EMDS
 	static struct button_handler button_handler = {
