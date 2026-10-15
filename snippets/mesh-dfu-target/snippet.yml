@@ -1,0 +1,7 @@
+name: mesh-dfu-target
+append:
+  SB_EXTRA_CONF_FILE: sysbuild.conf
+boards:
+  nrf54l15dk/nrf54l15/cpuapp:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54l15dk_nrf54l15_cpuapp.overlay

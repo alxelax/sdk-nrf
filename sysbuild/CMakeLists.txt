@@ -971,6 +971,10 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
       ${ZEPHYR_NRF_MODULE_DIR}/soc/nordic/nrf92/gen_uicr.conf
     )
   endif()
+
+  if(SB_CONFIG_BT_MESH_DFU_TARGET)
+    set_config_bool(${DEFAULT_IMAGE} CONFIG_BT_MESH_DFU_TARGET_LIB y)
+  endif()
 endfunction(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
 
 function(${SYSBUILD_CURRENT_MODULE_NAME}_post_image_cmake)

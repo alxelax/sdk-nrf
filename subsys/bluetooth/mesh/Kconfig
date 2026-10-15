@@ -194,6 +194,7 @@ rsource "Kconfig.models"
 rsource "Kconfig.dk_prov"
 rsource "shell/Kconfig"
 rsource "Kconfig.rpl"
+rsource "Kconfig.dfu_target_lib"
 
 endmenu
 

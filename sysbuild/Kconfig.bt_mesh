@@ -1,0 +1,13 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+config BT_MESH_DFU_TARGET
+	bool "Bluetooth Mesh DFU Target"
+	depends on BOOTLOADER_MCUBOOT
+	help
+	  Enable the Bluetooth Mesh DFU Target library
+	  (CONFIG_BT_MESH_DFU_TARGET_LIB) in the main application image only.
+	  Typically enabled through the mesh-dfu-target snippet.

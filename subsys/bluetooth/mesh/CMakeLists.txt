@@ -42,6 +42,11 @@ zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_CTRL_CLI light_ctrl_cli.c)
 
 zephyr_library_sources_ifdef(CONFIG_BT_MESH_DK_PROV dk_prov.c)
 
+if(CONFIG_BT_MESH_DFU_TARGET_LIB)
+  zephyr_library_sources(dfu_target_lib.c)
+  zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR_SRV sensor_srv.c)
 zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR_CLI sensor_cli.c)
 

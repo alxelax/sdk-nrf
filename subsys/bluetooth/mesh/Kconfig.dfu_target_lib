@@ -1,0 +1,39 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig BT_MESH_DFU_TARGET_LIB
+	bool "Bluetooth Mesh DFU Target library"
+	depends on BOOTLOADER_MCUBOOT
+	select FLASH
+	select FLASH_MAP
+	select FLASH_PAGE_LAYOUT
+	select STREAM_FLASH
+	select IMG_MANAGER
+	select REBOOT
+	select BT_MESH_MODEL_EXTENSIONS
+	select BT_MESH_BLOB_SRV
+	select BT_MESH_BLOB_IO_FLASH
+	select BT_MESH_DFU_SRV
+	imply BT_MESH_DFU_METADATA
+	help
+	  Add a ready-made Firmware Update Server and BLOB Transfer Server
+	  instance that stores received images in the MCUboot secondary slot.
+	  The application must place BT_MESH_DFU_TARGET_LIB_MODELS in its
+	  composition data. Typically enabled through the mesh-dfu-target
+	  snippet.
+
+if BT_MESH_DFU_TARGET_LIB
+
+# The library FWID is 10 bytes; the 106-byte default does not fit the
+# Firmware Update Info Status into samples with a small BT_MESH_TX_SEG_MAX.
+config BT_MESH_DFU_FWID_MAXLEN
+	default 16
+
+module = BT_MESH_DFU_TARGET_LIB
+module-str = Bluetooth Mesh DFU Target library
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # BT_MESH_DFU_TARGET_LIB

@@ -6,6 +6,7 @@
 
 #include <zephyr/bluetooth/bluetooth.h>
 #include <bluetooth/mesh/models.h>
+#include <bluetooth/mesh/dfu_target_lib.h>
 #include <dk_buttons_and_leds.h>
 #include "model_handler.h"
 #include "lc_pwm_led.h"
@@ -246,7 +247,8 @@ static struct bt_mesh_elem elements[] = {
 			     BT_MESH_MODEL_LIGHTNESS_SRV(
 					 &my_ctx.lightness_srv),
 			     BT_MESH_MODEL_SCENE_SRV(&scene_srv),
-			     BT_MESH_MODEL_SENSOR_SRV(&sensor_srv)),
+			     BT_MESH_MODEL_SENSOR_SRV(&sensor_srv)
+			     BT_MESH_DFU_TARGET_LIB_MODELS),
 		     BT_MESH_MODEL_NONE),
 	BT_MESH_ELEM(2,
 		     BT_MESH_MODEL_LIST(
