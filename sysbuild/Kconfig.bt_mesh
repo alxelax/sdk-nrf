@@ -11,3 +11,11 @@ config BT_MESH_DFU_TARGET
 	  Enable the Bluetooth Mesh DFU Target library
 	  (CONFIG_BT_MESH_DFU_TARGET_LIB) in the main application image only.
 	  Typically enabled through the mesh-dfu-target snippet.
+
+config BT_MESH_DFU_TARGET_EXT_FLASH
+	bool "Bluetooth Mesh DFU Target with secondary slot in external flash"
+	depends on BT_MESH_DFU_TARGET
+	help
+	  Apply MCUboot-only configuration needed to access the secondary slot
+	  in external SPI NOR flash. Typically enabled through the
+	  mesh-dfu-target-ext-flash snippet.

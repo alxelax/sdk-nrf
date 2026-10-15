@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/* Applied to both the application and MCUboot so they share one layout. */
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
+&cpuapp_rram {
+	partitions {
+		boot_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "mcuboot";
+			reg = <0x0 0xe000>;
+		};
+
+		slot0_partition: partition@e000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0xe000 0x14f000>;
+		};
+
+		storage_partition: partition@15d000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x15d000 0x8000>;
+		};
+	};
+};
+
+&mx25r64 {
+	status = "okay";
+
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		slot1_partition: partition@0 {
+			label = "image-1";
+			reg = <0x0 0x14f000>;
+		};
+	};
+};

@@ -975,6 +975,12 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
   if(SB_CONFIG_BT_MESH_DFU_TARGET)
     set_config_bool(${DEFAULT_IMAGE} CONFIG_BT_MESH_DFU_TARGET_LIB y)
   endif()
+
+  if(SB_CONFIG_BT_MESH_DFU_TARGET_EXT_FLASH)
+    # Taken from the dfu/target sample's MCUboot external flash configuration.
+    set_config_bool(mcuboot CONFIG_MULTITHREADING y)
+    set_config_int(mcuboot CONFIG_MAIN_STACK_SIZE 20480)
+  endif()
 endfunction(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
 
 function(${SYSBUILD_CURRENT_MODULE_NAME}_post_image_cmake)
